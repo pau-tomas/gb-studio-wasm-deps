@@ -1,0 +1,56 @@
+diff --git a/include/asm/symbol.h b/include/asm/symbol.h
+index 627868f4..4dd9076b 100644
+--- a/include/asm/symbol.h
++++ b/include/asm/symbol.h
+@@ -110,6 +110,7 @@ void sym_ForEach(void (*func)(struct Symbol *, void *), void *arg);
+ 
+ int32_t sym_GetValue(struct Symbol const *sym);
+ void sym_SetExportAll(bool set);
++struct Symbol *sym_AddSecret();
+ struct Symbol *sym_AddLocalLabel(char const *symName);
+ struct Symbol *sym_AddLabel(char const *symName);
+ struct Symbol *sym_AddAnonLabel(void);
+diff --git a/src/asm/parser.y b/src/asm/parser.y
+index 21d6a536..f98ecd36 100644
+--- a/src/asm/parser.y
++++ b/src/asm/parser.y
+@@ -789,7 +789,7 @@ else		: T_POP_ELSE T_NEWLINE {
+ ;
+ 
+ plain_directive	: label
+-		| label cpu_command
++		| label { sym_AddSecret(); } cpu_command
+ 		| label macro
+ 		| label directive
+ 		| assignment_directive
+diff --git a/src/asm/symbol.c b/src/asm/symbol.c
+index 4a565d7a..3c176e22 100644
+--- a/src/asm/symbol.c
++++ b/src/asm/symbol.c
+@@ -349,6 +349,26 @@ void sym_SetCurrentSymbolScope(char const *newScope)
+ 	labelScope = newScope;
+ }
+ 
++static uint32_t secret_counter = 0;
++struct Symbol *sym_AddSecret()
++{
++    struct Symbol *sym;
++    char name[MAXSYMLEN + 1];
++    secret_counter += 1;
++    sprintf(name, "__SEC_%x_%x_%s", secret_counter, lexer_GetLineNo(), fstk_GetFileName());
++
++    sym = createsymbol(name);
++	sym->type = SYM_LABEL;
++    sym->value = sect_GetSymbolOffset();
++    sym->isExported = true;
++
++	sym->section = sect_GetSymbolSection();
++
++	updateSymbolFilename(sym);
++    return sym;
++}
++
++
+ /*
+  * Create a symbol that will be non-relocatable and ensure that it
+  * hasn't already been defined or referenced in a context that would
