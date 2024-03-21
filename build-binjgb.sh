@@ -9,10 +9,11 @@ fi
 
 cd binjgb
 
-! mkdir out
+! rm -rf out
+! mkdir -p out
 cd out
 
-cmake -E env LDFLAGS='-s EXPORT_ES6=1' \
+cmake -E env LDFLAGS='' \
     cmake \
         -DCMAKE_TOOLCHAIN_FILE=${EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake \
         -DCMAKE_BUILD_TYPE=Release \
