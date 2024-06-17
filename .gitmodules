@@ -1,7 +1,7 @@
 [submodule "binjgb"]
 	path = binjgb
-	url = https://github.com/pau-tomas/binjgb
-	branch = gb-studio
+	url = https://github.com/binji/binjgb
+	branch = main
 [submodule "rgbds"]
 	path = rgbds
 	url = https://github.com/gbdev/rgbds/

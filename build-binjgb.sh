@@ -19,7 +19,7 @@ cmake -E env LDFLAGS='' \
         -DCMAKE_BUILD_TYPE=Release \
         -DWERROR=ON \
         -DWASM=true \
-        -DRGBDS_LIVE=ON \
+        -DGBSTUDIO=ON \
         ../
 make
 
